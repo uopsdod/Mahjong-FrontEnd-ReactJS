@@ -1,5 +1,4 @@
 import React, { Component } from 'react';
-import logo from './logo.svg';
 import './App.css';
 
 const divStyle = {
@@ -19,6 +18,7 @@ class GameEnv extends Component {
 	constructor(props){
 		super(props);
 		this.initiateGame = this.initiateGame.bind(this);
+		this.putTileToDiscardedPool = this.putTileToDiscardedPool.bind(this);
 		
 		this.state = {
 			windRound: "eastWindRound" // eastWindRound, sourthWindRound, westWindRound, NorthWindRound  
@@ -26,7 +26,7 @@ class GameEnv extends Component {
 			,remainingTiles: [1,2,2,3,4,5,'A','B','C']
 			,discardedPool: [7,7,7,'J']
 			,playerOrder: ["0","1"]
-			,playerTurn: [false, false]
+			,playerTurn: [false, false] // flag it to know current PlayerTurn
 			,PlayerInfo000: { //we probably can make it as a JS class 
 				id: "0"
 				,name : "Sam"
@@ -72,6 +72,40 @@ class GameEnv extends Component {
 		this.changeTurn(null, this.state.PlayerInfo000);
 	
 	}	
+
+
+
+	putTileToDiscardedPool(event){
+		console.log("GameEnv.putTileToDiscardedPool() called");
+		event.preventDefault();
+		let index = event.currentTarget.getAttribute('index');
+		let discardedTile = event.currentTarget.textContent;
+		console.log('index: ', index);
+		console.log('discardedTile: ' , discardedTile); // jackpot
+	
+		// call an RESTful api to update a centralized data
+		// 1. new tile the player got
+		// 2. discarded tile 
+	
+	
+		// four consumers get notified of the new changes
+		// remove tile from player's hand 
+		if (this.state.playerTurn[0]){
+			let PlayerInfo000 = Object.assign({}, this.state.PlayerInfo000);    //creating copy of object
+			console.log("GameEnv.putTileToDiscardedPool() hand before: ", PlayerInfo000.hand);
+			PlayerInfo000.hand.splice(index,1);
+			console.log("GameEnv.putTileToDiscardedPool() hand after: ", PlayerInfo000.hand);
+			this.setState({PlayerInfo000});
+		}else if (this.state.playerTurn[1]){
+			console.log("GameEnv.putTileToDiscardedPool() hand before: ", this.state.PlayerInfo001.hand);
+		}
+	
+		// update the discarded pool
+		
+		// TODO: remove one tile from hand
+		// TODO: add one tile into discarded pool 
+
+	}
 	
 	changeTurn(currentPlayer, nextPlayer){
 		console.log("GameEnv.changeTurn() called ");
@@ -93,21 +127,21 @@ class GameEnv extends Component {
 		// get a new tile from the remaining tile
 		const remainingTiles = this.state.remainingTiles.slice(0);
 		const tile = remainingTiles.pop();
-		console.log("GameEnv.startTurn() tile: ", tile);
+		console.log("GameEnv.startTurn() new tile: ", tile);
 		this.setState({remainingTiles});
 		
 		// put the new file into the hand
-		if ("0" == player.id){
+		if ("0" === player.id){
 			let PlayerInfo000 = JSON.parse(JSON.stringify(player));
-			
+			console.log("GameEnv.startTurn() hand before: ", PlayerInfo000.hand);
 			PlayerInfo000.hand.push(tile);
-			console.log("GameEnv.startTurn() hand: ", PlayerInfo000.hand);
+			console.log("GameEnv.startTurn() hand after: ", PlayerInfo000.hand);
 			this.setState({PlayerInfo000});			
-		}else if ("1" == player.id){
+		}else if ("1" === player.id){
 			let PlayerInfo001 = JSON.parse(JSON.stringify(player));
-			
+			console.log("GameEnv.startTurn() hand before: ", PlayerInfo001.hand);			
 			PlayerInfo001.hand.push(tile);
-			console.log("GameEnv.startTurn() hand: ", PlayerInfo001.hand);
+			console.log("GameEnv.startTurn() hand after: ", PlayerInfo001.hand);
 			this.setState({PlayerInfo001});						
 		}
 	}
@@ -135,6 +169,8 @@ class GameEnv extends Component {
 						hand={this.state.PlayerInfo000.hand} 
 						name={this.state.PlayerInfo000.name} 
 						money={this.state.PlayerInfo000.money}
+
+						putTileToDiscardedPool={this.putTileToDiscardedPool}
 					/>
 					<Spaces/>
 					<Player 
@@ -145,6 +181,7 @@ class GameEnv extends Component {
 						hand={this.state.PlayerInfo001.hand} 
 						name={this.state.PlayerInfo001.name} 
 						money={this.state.PlayerInfo001.money}
+						putTileToDiscardedPool={this.putTileToDiscardedPool}
 					/>					
 					{/*<Player name="Tom"/><Spaces/><Player name="Jason"/><Spaces/><Player name="Kevin"/>*/}
 				</div>
@@ -153,27 +190,22 @@ class GameEnv extends Component {
 	}	
 }
 
-function putTileToDiscardedPool(event)
-{
-	event.preventDefault();
-    console.log('a tile in your hand is clicked - event: ' , event);
-	console.log('a tile in your hand is clicked - event.target: ' , event.target);
-	console.log('a tile in your hand is clicked - event.target: ' , event.target.children[0]);
-	console.log('a tile in your hand is clicked - event.target: ' , event.currentTarget.textContent); // jackpot
-
-	// call an RESTful api
-	// get the response back
-
-	// update the discarded pool
-	
-	// TODO: remove one tile from hand
-	// TODO: add one tile into discarded pool 
-	
-	
-	return false;
-}
 
 class Player extends Component {
+
+	constructor(props){
+		super(props);		
+		this.putTileToDiscardedPool = this.putTileToDiscardedPool.bind(this);
+	}
+
+
+	putTileToDiscardedPool(event)
+	{
+		console.log("Player.putTileToDiscardedPool() called");
+		return this.props.putTileToDiscardedPool(event);
+	}
+
+
 	render() {
 		return (
 			<div>
@@ -186,7 +218,7 @@ class Player extends Component {
 				<br/>
 				FaceUpTiles: {this.props.faceUpTiles.map((item,index) => <span key={index}>{item},</span>)}
 				<br/>
-				Hand: {this.props.hand.map((item,index) => <span key={index}><a href="#" onClick={putTileToDiscardedPool}>{item}</a><span>,</span></span>)}
+				Hand: {this.props.hand.map((item,index) => <span key={index}><a href="#" index={index} onClick={this.putTileToDiscardedPool}>{item}</a><span>,</span></span>)}
 				<br/>
 				Name: {this.props.name}
 				<br/>
@@ -203,6 +235,7 @@ class Spaces extends Component {
 		);
 	}
 }
+
 
 
 export default App;
