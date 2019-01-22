@@ -100,8 +100,10 @@ class GameEnv extends Component {
 			console.log("GameEnv.putTileToDiscardedPool() hand before: ", this.state.PlayerInfo001.hand);
 		}
 	
-		// update the discarded pool
-		
+		// put it to the discarded pool
+		const discardedPool = this.state.discardedPool.slice(0); //creating copy of object
+		discardedPool.push(discardedTile);
+		this.setState({discardedPool});
 		// TODO: remove one tile from hand
 		// TODO: add one tile into discarded pool 
 
