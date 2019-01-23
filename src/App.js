@@ -23,7 +23,8 @@ class GameEnv extends Component {
 		
 		
 		this.state = {
-			windRound: "eastWindRound" // eastWindRound, sourthWindRound, westWindRound, NorthWindRound  
+			announcement: ""
+			,windRound: "eastWindRound" // eastWindRound, sourthWindRound, westWindRound, NorthWindRound  
 			,host: "0" // 
 			// ,remainingTiles: [1,2,2,3,4,5,'A','B','C']
 			,remainingTiles: [1,'A','B'] // testing 
@@ -70,7 +71,6 @@ class GameEnv extends Component {
 
 	changeTurn(currentTurnIndex, nextTurnIndex){
 		console.log("GameEnv.changeTurn() called ");
-		console.log("GameEnv.changeTurn() currentTurnIndex: " , currentTurnIndex);
 		let playerTurn = this.state.playerTurn.slice(0);
 		if (typeof currentTurnIndex !== 'undefined') {
 			playerTurn[currentTurnIndex] = false; //updating value
@@ -79,7 +79,7 @@ class GameEnv extends Component {
 		playerTurn[nextTurnIndex] = true; //updating value
 		this.setState({ playerTurn }, () => { // callback for this.setState
 			let switchPlayer = this.getCurrentPlayer();
-			console.log("switchPlayer: " , switchPlayer);
+			console.log("GameEnv.changeTurn() switchPlayer: " , switchPlayer);
 			this.startTurn(switchPlayer);	
 		}); 
 		
@@ -154,7 +154,7 @@ class GameEnv extends Component {
 		console.log("remainingTiles: " , remainingTiles , "hey", remainingTiles.length === 0);
 		console.log("remainingTiles.length: " , remainingTiles.length);
 		if (remainingTiles.length === 0) {
-			console.log("end of the game - a tie");
+			this.endGame("Tie (End of the game)");
 			return;
 		}
 
@@ -166,10 +166,26 @@ class GameEnv extends Component {
 		this.changeTurn(currentTurnIndex, nextTurnIndex);
 	}
 
+	endGame(msg){
+		console.log("end of the game - a tie");
+		let announcement = msg;
+		this.setState({announcement});
+
+		let playerTurn = this.state.playerTurn.slice(0);
+		playerTurn[0] = false;
+		playerTurn[1] = false;
+		this.setState({playerTurn});
+
+		let PlayerInfo000 = Object.assign({}, this.state.PlayerInfo000);    //creating copy of object
+		this.setState({PlayerInfo000});
+		let PlayerInfo001 = Object.assign({}, this.state.PlayerInfo001);    //creating copy of object
+		this.setState({PlayerInfo001});
+
+	}
+
 	/////////// Util section starts /////////////
 	getCurrentTurnIndex(){
 		const playerTurn = this.state.playerTurn.slice(0);
-		console.log("getCurrentTurnIndex playerTurn: ", playerTurn);
 		let currentTurnIndex = playerTurn.findIndex(function(ele){
 			return ele === true;
 		})
@@ -179,7 +195,6 @@ class GameEnv extends Component {
 	getNextTurnIndex(){
 		let currentTurnIndex = this.getCurrentTurnIndex();
 		const playerTurn = this.state.playerTurn.slice(0);
-		console.log("playerTurn.length: " , playerTurn.length);
 		let nextTurnIndex;
 		if (currentTurnIndex + 2 > playerTurn.length) {
 			nextTurnIndex = 0;
@@ -198,7 +213,6 @@ class GameEnv extends Component {
 	}
 
 	getCurrentPlayer(){
-		console.log("getCurrentPlayer() called");
 		let currentTurnIndex = this.getCurrentTurnIndex();
 		let currentPlayerId = this.state.playerIdOrder[currentTurnIndex];
 		let currentPlayer = this.getPlayerById(currentPlayerId);
@@ -208,15 +222,17 @@ class GameEnv extends Component {
 	getNextPlayer(){
 		let nextTurnIndex = this.getNextTurnIndex();
 		let nextPlayerId = this.state.playerIdOrder[nextTurnIndex];
-		console.log("nextPlayerId: " , nextPlayerId);
 		let nextPlayer = this.getPlayerById(nextPlayerId);
 		return nextPlayer;
 	}
 	/////////// Util section ends /////////////
 
 	render() {
+		console.log("GameEnv.render() called ");
 		return (
 			<div>
+				Annoucement: {this.state.announcement}
+				<br/>
 				Wind Round: {this.state.windRound}
 				<br/>
 				Host: {this.state.host}
@@ -274,9 +290,9 @@ class Player extends Component {
 	}
 
 	render() {
+		console.log("Player.render() called");
 		let hand = this.props.hand.map((item,index) => <span key={index}><a index={index} >{item}</a><span>,</span></span>);
 		let currentPlayer = this.props.getCurrentPlayer();
-		console.log("Player currentPlayer: ", currentPlayer);
 		if (currentPlayer && currentPlayer.name == this.props.name) {
 			hand = this.props.hand.map((item,index) => <span key={index}><a href="#" index={index} onClick={this.putTileToDiscardedPool}>{item}</a><span>,</span></span>);
 		}
