@@ -25,7 +25,8 @@ class GameEnv extends Component {
 		this.state = {
 			windRound: "eastWindRound" // eastWindRound, sourthWindRound, westWindRound, NorthWindRound  
 			,host: "0" // 
-			,remainingTiles: [1,2,2,3,4,5,'A','B','C']
+			// ,remainingTiles: [1,2,2,3,4,5,'A','B','C']
+			,remainingTiles: [1,'A','B'] // testing 
 			,discardedPool: [7,7,7,'J']
 			,playerIdOrder: ["0","1"]
 			,playerTurn: [false, false] // flag it to know current PlayerTurn
@@ -88,12 +89,6 @@ class GameEnv extends Component {
 		console.log("GameEnv.startTurn() called ");
 		// get a new tile from the remaining tile
 		const remainingTiles = this.state.remainingTiles.slice(0);
-
-		if (remainingTiles.length == 0) {
-			console.log("No more tiles to get!");
-			return;
-		}
-
 		const tile = remainingTiles.pop();
 		console.log("GameEnv.startTurn() new tile: ", tile);
 		this.setState({remainingTiles});
@@ -119,7 +114,6 @@ class GameEnv extends Component {
 		event.preventDefault();
 
 		// check if it's the player's turn
-
 
 
 		let index = event.currentTarget.getAttribute('index');
@@ -154,6 +148,15 @@ class GameEnv extends Component {
 		this.setState({discardedPool});
 
 		// something might happen here ex. Pong, Kong, Chow
+
+		// check if it's the end of the game
+		const remainingTiles = this.state.remainingTiles.slice(0);
+		console.log("remainingTiles: " , remainingTiles , "hey", remainingTiles.length === 0);
+		console.log("remainingTiles.length: " , remainingTiles.length);
+		if (remainingTiles.length === 0) {
+			console.log("end of the game - a tie");
+			return;
+		}
 
 		// trigger the next turn
 		let currentTurnIndex = this.getCurrentTurnIndex();
