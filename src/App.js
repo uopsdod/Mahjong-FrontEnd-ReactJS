@@ -1,10 +1,15 @@
 import React, { Component } from 'react';
 import './App.css';
 
+// https://www.ymimports.com/pages/how-to-play-american-mahjong#Equipment
+// http://www.dragona.com.tw/mahjong-english/
+
 const divStyle = {
   display: 'flex',
   alignItems: 'center'
 };
+
+let playerInitialTileNumber = 16;
 
 class App extends Component {
 	render() {
@@ -26,8 +31,37 @@ class GameEnv extends Component {
 			announcement: ""
 			,windRound: "eastWindRound" // eastWindRound, sourthWindRound, westWindRound, NorthWindRound  
 			,host: "0" // 
-			// ,remainingTiles: [1,2,2,3,4,5,'A','B','C']
-			,remainingTiles: [1,'A','B'] // testing 
+			// ,remainingTiles: [
+			// 	 'circle1','circle2','circle3','circle4','circle5','circle6','circle7','circle8','circle9'
+			// 	,'circle1','circle2','circle3','circle4','circle5','circle6','circle7','circle8','circle9'
+			// 	,'circle1','circle2','circle3','circle4','circle5','circle6','circle7','circle8','circle9'
+			// 	,'circle1','circle2','circle3','circle4','circle5','circle6','circle7','circle8','circle9'
+			// 	,'bamboo1','bamboo2','bamboo3','bamboo4','bamboo5','bamboo6','bamboo7','bamboo8','bamboo9'
+			// 	,'bamboo1','bamboo2','bamboo3','bamboo4','bamboo5','bamboo6','bamboo7','bamboo8','bamboo9'
+			// 	,'bamboo1','bamboo2','bamboo3','bamboo4','bamboo5','bamboo6','bamboo7','bamboo8','bamboo9'
+			// 	,'bamboo1','bamboo2','bamboo3','bamboo4','bamboo5','bamboo6','bamboo7','bamboo8','bamboo9'
+			// 	,'character1','character2','character3','character4','character5','character6','character7','character8','character9'
+			// 	,'character1','character2','character3','character4','character5','character6','character7','character8','character9'
+			// 	,'character1','character2','character3','character4','character5','character6','character7','character8','character9'
+			// 	,'character1','character2','character3','character4','character5','character6','character7','character8','character9'
+			// 	,'eastwind', 'southwind', 'westwind', 'northwind'
+			// 	,'eastwind', 'southwind', 'westwind', 'northwind'
+			// 	,'eastwind', 'southwind', 'westwind', 'northwind'
+			// 	,'eastwind', 'southwind', 'westwind', 'northwind'
+			// 	,'whitedragon', 'greendragon', 'reddragon'
+			// 	,'whitedragon', 'greendragon', 'reddragon'
+			// 	,'whitedragon', 'greendragon', 'reddragon'
+			// 	,'whitedragon', 'greendragon', 'reddragon'
+			// 	,'plumflower', 'orchidflower', 'chrysanthemumflower','bambooflower'
+			// 	,'springseason', 'summerseason', 'autumnseason', 'winterseason'
+			// ]
+			,remainingTiles: [
+				'circle1','circle2','circle3','circle4','circle5','circle6','circle7','circle8','circle9'
+				,'bamboo1','bamboo2','bamboo3','bamboo4','bamboo5','bamboo6','bamboo7','bamboo8','bamboo9'
+				,'character1','character2','character3','character4','character5','character6','character7','character8','character9'
+				,'eastwind', 'southwind', 'westwind', 'northwind'
+				,'plumflower', 'orchidflower', 'chrysanthemumflower','bambooflower'
+			] // testing 
 			,discardedPool: [7,7,7,'J']
 			,playerIdOrder: ["0","1"]
 			,playerTurn: [false, false] // flag it to know current PlayerTurn
@@ -40,7 +74,7 @@ class GameEnv extends Component {
 				,seasons: [2,3]
 				,faceUpTiles: [6,7,8]
 				,factDownTiles: [9,9,9,9]
-				,hand: [2,2,4,5,5,'O','O']					
+				,hand: []					
 			}
 			,PlayerInfo001: {
 				id: "1"
@@ -51,7 +85,7 @@ class GameEnv extends Component {
 				,seasons: [2,3]
 				,faceUpTiles: [1,2,3]
 				,factDownTiles: [5,5,5,5]
-				,hand: [1,3,4,5,5,'O','K']				
+				,hand: []				
 			}			
 		}; 
 		
@@ -65,9 +99,38 @@ class GameEnv extends Component {
 
 	initiateGame(e){
 		console.log("GameEnv.initiateGame() called ");
+
+		// give tiles to each player randomly 
+		this.assignTiles();
+
+		// start the first turn
 		let initialTurnIndex = 0;
 		this.changeTurn(null, initialTurnIndex);
 	}	
+
+	assignTiles(){
+		let remainingTiles = this.state.remainingTiles.slice(0);
+		console.log("GameEnv.remainingTiles() hand now: ", remainingTiles);
+
+		let PlayerInfo000 = Object.assign({}, this.state.PlayerInfo000);    //creating copy of object
+		this.assignTilesToPlayer(PlayerInfo000, remainingTiles);
+		this.setState({PlayerInfo000});
+		let PlayerInfo001 = Object.assign({}, this.state.PlayerInfo001);    //creating copy of object
+		this.assignTilesToPlayer(PlayerInfo001, remainingTiles);
+		this.setState({PlayerInfo001});
+
+		this.setState({remainingTiles});		
+		console.log("GameEnv.remainingTiles() hand now: ", remainingTiles);
+	}
+
+	assignTilesToPlayer(player, remainingTiles){
+		for (let i = 0; i < playerInitialTileNumber; i++) {
+			let poppedIndex = this.getRandomIndexFromArray(remainingTiles);
+			let poppedTile = remainingTiles[poppedIndex];
+			this.removeItemFromArrayByIndex(remainingTiles, poppedIndex);
+			player.hand.push(poppedTile);
+		}
+	}
 
 	changeTurn(currentTurnIndex, nextTurnIndex){
 		console.log("GameEnv.changeTurn() called ");
@@ -88,22 +151,25 @@ class GameEnv extends Component {
 	startTurn(player){
 		console.log("GameEnv.startTurn() called ");
 		// get a new tile from the remaining tile
-		const remainingTiles = this.state.remainingTiles.slice(0);
-		const tile = remainingTiles.pop();
-		console.log("GameEnv.startTurn() new tile: ", tile);
+		let remainingTiles = this.state.remainingTiles.slice(0);
+		let poppedIndex = this.getRandomIndexFromArray(remainingTiles);
+		let poppedTile = remainingTiles[poppedIndex];
+		this.removeItemFromArrayByIndex(remainingTiles, poppedIndex);
+		console.log("GameEnv.startTurn() new tile: ", poppedTile);
+		console.log("GameEnv.remainingTiles() hand now: ", remainingTiles);
 		this.setState({remainingTiles});
 		
 		// put the new file into the hand
 		if ("0" === player.id){
 			let PlayerInfo000 = JSON.parse(JSON.stringify(player));
 			console.log("GameEnv.startTurn() hand before: ", PlayerInfo000.hand);
-			PlayerInfo000.hand.push(tile);
+			PlayerInfo000.hand.push(poppedTile);
 			console.log("GameEnv.startTurn() hand after: ", PlayerInfo000.hand);
 			this.setState({PlayerInfo000});			
 		}else if ("1" === player.id){
 			let PlayerInfo001 = JSON.parse(JSON.stringify(player));
 			console.log("GameEnv.startTurn() hand before: ", PlayerInfo001.hand);			
-			PlayerInfo001.hand.push(tile);
+			PlayerInfo001.hand.push(poppedTile);
 			console.log("GameEnv.startTurn() hand after: ", PlayerInfo001.hand);
 			this.setState({PlayerInfo001});						
 		}
@@ -225,6 +291,15 @@ class GameEnv extends Component {
 		let nextPlayer = this.getPlayerById(nextPlayerId);
 		return nextPlayer;
 	}
+
+	getRandomIndexFromArray(ary){
+		return Math.floor(Math.random()*ary.length);
+	}
+
+	removeItemFromArrayByIndex(ary, index){
+		ary.splice(index,1);
+	}
+	
 	/////////// Util section ends /////////////
 
 	render() {
@@ -257,6 +332,9 @@ class GameEnv extends Component {
 						getCurrentPlayer={this.getCurrentPlayer}
 					/>
 					<Spaces/>
+					{/*<Player name="Tom"/><Spaces/><Player name="Jason"/><Spaces/><Player name="Kevin"/>*/}
+				</div>
+				<div>
 					<Player 
 						flowers={this.state.PlayerInfo001.flowers}
 						seasons={this.state.PlayerInfo001.seasons}
@@ -269,7 +347,6 @@ class GameEnv extends Component {
 						putTileToDiscardedPool={this.putTileToDiscardedPool}
 						getCurrentPlayer={this.getCurrentPlayer}
 					/>					
-					{/*<Player name="Tom"/><Spaces/><Player name="Jason"/><Spaces/><Player name="Kevin"/>*/}
 				</div>
 			</div>
 		);
