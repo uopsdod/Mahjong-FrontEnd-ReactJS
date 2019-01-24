@@ -4,6 +4,9 @@ import './App.css';
 // https://www.ymimports.com/pages/how-to-play-american-mahjong#Equipment
 // http://www.dragona.com.tw/mahjong-english/
 
+const isTestMode_g = true;
+let poppedTile_g = '';
+
 const divStyle = {
   display: 'flex',
   alignItems: 'center'
@@ -59,8 +62,8 @@ class GameEnv extends Component {
 				'circle1','circle2','circle3','circle4','circle5','circle6','circle7','circle8','circle9'
 				,'bamboo1','bamboo2','bamboo3','bamboo4','bamboo5','bamboo6','bamboo7','bamboo8','bamboo9'
 				,'character1','character2','character3','character4','character5','character6','character7','character8','character9'
-				,'eastwind', 'southwind', 'westwind', 'northwind'
-				,'plumflower', 'orchidflower', 'chrysanthemumflower','bambooflower'
+				,'windeast', 'windsouth', 'windwest', 'windnorth'
+				,'flowerplum', 'flowerorchid', 'flowerchrysanthemum','flowerbamboo'
 			] // testing 
 			,discardedPool: [7,7,7,'J']
 			,playerIdOrder: ["0","1"]
@@ -74,7 +77,11 @@ class GameEnv extends Component {
 				,seasons: [2,3]
 				,faceUpTiles: [6,7,8]
 				,factDownTiles: [9,9,9,9]
-				,hand: []					
+				,hand: [
+					'circle1','circle2','circle3','circle4','circle5','circle6','circle7','circle8','circle9'
+					,'bamboo1','bamboo2','bamboo3','bamboo4','bamboo5','bamboo6'
+					,'circle8'
+				] // specify it for testing purpose 
 			}
 			,PlayerInfo001: {
 				id: "1"
@@ -101,7 +108,9 @@ class GameEnv extends Component {
 		console.log("GameEnv.initiateGame() called ");
 
 		// give tiles to each player randomly 
-		this.assignTiles();
+		if (!isTestMode_g){
+			this.assignTiles();
+		}
 
 		// start the first turn
 		let initialTurnIndex = 0;
@@ -113,9 +122,11 @@ class GameEnv extends Component {
 		console.log("GameEnv.remainingTiles() hand now: ", remainingTiles);
 
 		let PlayerInfo000 = Object.assign({}, this.state.PlayerInfo000);    //creating copy of object
+		PlayerInfo000.length = 0; // empty the array
 		this.assignTilesToPlayer(PlayerInfo000, remainingTiles);
 		this.setState({PlayerInfo000});
 		let PlayerInfo001 = Object.assign({}, this.state.PlayerInfo001);    //creating copy of object
+		PlayerInfo001.length = 0; // empty the array
 		this.assignTilesToPlayer(PlayerInfo001, remainingTiles);
 		this.setState({PlayerInfo001});
 
@@ -130,6 +141,13 @@ class GameEnv extends Component {
 			this.removeItemFromArrayByIndex(remainingTiles, poppedIndex);
 			player.hand.push(poppedTile);
 		}
+
+		// tests !!!!!!!!! 
+		player.hand.push("same");
+		player.hand.push("same");
+		player.hand.push("same");
+		player.hand.push("same");
+
 	}
 
 	changeTurn(currentTurnIndex, nextTurnIndex){
@@ -160,20 +178,123 @@ class GameEnv extends Component {
 		this.setState({remainingTiles});
 		
 		// put the new file into the hand
-		if ("0" === player.id){
-			let PlayerInfo000 = JSON.parse(JSON.stringify(player));
-			console.log("GameEnv.startTurn() hand before: ", PlayerInfo000.hand);
-			PlayerInfo000.hand.push(poppedTile);
-			console.log("GameEnv.startTurn() hand after: ", PlayerInfo000.hand);
-			this.setState({PlayerInfo000});			
-		}else if ("1" === player.id){
-			let PlayerInfo001 = JSON.parse(JSON.stringify(player));
-			console.log("GameEnv.startTurn() hand before: ", PlayerInfo001.hand);			
-			PlayerInfo001.hand.push(poppedTile);
-			console.log("GameEnv.startTurn() hand after: ", PlayerInfo001.hand);
-			this.setState({PlayerInfo001});						
-		}
+		let playerToUpdate = Object.assign({}, player);    //creating copy of object;
+		console.log("GameEnv.startTurn() hand before: ", playerToUpdate.hand);
+		playerToUpdate.hand.push(poppedTile);
+
+		this.setState({playerToUpdate}, () => { // callback for this.setState
+			// examine the deck
+			console.log("GameEnv.startTurn() hand after: ", playerToUpdate.hand);
+			let isWin = this.isWinDeck(playerToUpdate.hand);
+			console.log("GameEnv.startTurn() isWin: ", isWin);
+
+			// end the game and go to the next player to be the host (let's not consider the case in which the winner is also the host itself)
+			// TODO
+		}); 
 	}
+
+	isWinDeck(hand){
+		console.log("GameEnv.isWinDeck() called ");
+
+		// temporarily sort the hand 
+		hand.sort();
+		console.log("GameEnv.isWinDeck() sorted hand: ", hand);
+
+		// check if there are 5 three-consecutive tiles and 1 pair 
+		let isWin = false;
+		let handToCheck = hand.slice(0);
+		// check how many three-consecutive	are there 
+		let previousPrefix;
+		let previousNo;
+		let combination;
+		let numberOfThreeConsecutiveTiles = 0;
+		let currentNumberOfConsecutiveTile = 0;
+		handToCheck.forEach((item, index)=>{
+			console.log("GameEnv.isWinDeck() index(",index,"): ", item);
+			let ary = item.replace(/\'/g, '').split(/(\d+)/).filter(Boolean); // ex. convert "circle9" into ["circle",9]
+			let currentPrefix = ary[0];
+			let currentNo = Number(ary[1]); // it might be undefined
+			
+			// for tiles that are not circles, bamboos, characters, skip them
+			if (currentNo === undefined) {
+				console.log("GameEnv.isWinDeck() not a tile with number: ", currentPrefix);
+				return; // note: this will only skip one iteration; it will NOT terminate the whole foreach operation 
+			}else{
+				// check if this is a consecutive one
+				let isConsecutive = false;
+				if (previousPrefix && (previousPrefix === currentPrefix)){ 
+					if (previousNo && ((previousNo+1) === currentNo)){
+						isConsecutive = true;
+						combination += (" -> " + currentPrefix+currentNo);
+						console.log("GameEnv.isWinDeck() current combination: ", combination);
+						currentNumberOfConsecutiveTile += 1;
+						previousNo = currentNo;
+					}else if (previousNo && (previousNo === currentNo)){ // when there are duplicate tiles
+						console.log("GameEnv.isWinDeck() skip duplicate tiles: ");
+						return; // note: this will only skip one iteration; it will NOT terminate the whole foreach operation 
+					}
+				}
+
+				// check if this should be the first tile in this round 
+				if (!isConsecutive) {
+					// console.log("GameEnv.isWinDeck() first tile in this round");
+					currentNumberOfConsecutiveTile = 1;
+					previousPrefix = currentPrefix;
+					previousNo = Number(currentNo);
+					combination = currentPrefix+currentNo;
+				}
+
+			}			
+			
+			if (currentNumberOfConsecutiveTile === 3) {
+				console.log("GameEnv.isWinDeck() bingo!");
+				numberOfThreeConsecutiveTiles += 1;
+				currentNumberOfConsecutiveTile = 0;
+				previousPrefix = undefined;
+				previousNo = undefined;
+				//TODO: consider use a tmp hand and dedeuct elements from it for this calculation 
+			}
+			
+
+		}); // end of handToCheck.forEach(...)
+
+		console.log("GameEnv.isWinDeck() numberOfThreeConsecutiveTiles: ", numberOfThreeConsecutiveTiles);
+		
+		// phase 1 : a very simple conbination to win
+		if (Number(numberOfThreeConsecutiveTiles) === 5) {
+			isWin = true;
+		}else if (Number(numberOfThreeConsecutiveTiles) === 4) {
+			//TODO: check if there are 11 56
+			//TODO: check if there are 11 88
+			//TODO: else: isWin = false;
+		}else{
+			isWin = false;
+		}
+
+		// check if there is two pairs
+
+		// handToCheck.forEach((item, index)=>{
+		// 	if(counts[item] === undefined) {
+		// 		counts[item] = 1;
+		// 	} else if (counts[item] >= 1){
+		// 		counts[item] += 1;
+		// 	}
+
+	
+		// });
+
+		// console.log("GameEnv.isWinDeck() pair found: " , handToCheck[index]);
+		// console.log("GameEnv.isWinDeck() counts: " , counts);
+		// console.log("GameEnv.isWinDeck() number of pairs: " , pairCount);
+
+		if (isWin) {
+			// do something here ? (considering...)			
+		}	
+
+		return isWin;
+	}
+
+	///////////////////////////////////// another flow starts below /////////////////////////////////////
 
 	putTileToDiscardedPool(event){
 		console.log("GameEnv.putTileToDiscardedPool() called");
