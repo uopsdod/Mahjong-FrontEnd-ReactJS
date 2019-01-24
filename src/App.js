@@ -301,8 +301,6 @@ class GameEnv extends Component {
 		event.preventDefault();
 
 		// check if it's the player's turn
-
-
 		let index = event.currentTarget.getAttribute('index');
 		let discardedTile = event.currentTarget.textContent;
 		console.log('index: ', index);
@@ -312,22 +310,14 @@ class GameEnv extends Component {
 		// 1. new tile the player got
 		// 2. discarded tile 
 	
-	
 		// four consumers get notified of the new changes
 		// remove tile from player's hand 
-		if (this.getCurrentPlayer().id == 0){
-			let PlayerInfo000 = Object.assign({}, this.state.PlayerInfo000);    //creating copy of object
-			console.log("GameEnv.putTileToDiscardedPool() hand before: ", PlayerInfo000.hand);
-			PlayerInfo000.hand.splice(index,1);
-			console.log("GameEnv.putTileToDiscardedPool() hand after: ", PlayerInfo000.hand);
-			this.setState({PlayerInfo000});
-		}else if (this.getCurrentPlayer().id == 1){
-			let PlayerInfo001 = Object.assign({}, this.state.PlayerInfo001);    //creating copy of object
-			console.log("GameEnv.putTileToDiscardedPool() hand before: ", PlayerInfo001.hand);
-			PlayerInfo001.hand.splice(index,1);
-			console.log("GameEnv.putTileToDiscardedPool() hand after: ", PlayerInfo001.hand);
-			this.setState({PlayerInfo001});
-		}
+		let player = this.getCurrentPlayer();
+		let playerToUpdate = Object.assign({}, player);    //creating copy of object
+		console.log("GameEnv.putTileToDiscardedPool() hand before: ", playerToUpdate.hand);
+		playerToUpdate.hand.splice(index,1);
+		console.log("GameEnv.putTileToDiscardedPool() hand after: ", playerToUpdate.hand);
+		this.setState({playerToUpdate});
 	
 		// put it to the discarded pool
 		const discardedPool = this.state.discardedPool.slice(0); //creating copy of object
