@@ -5,6 +5,9 @@ phases:
     commands:
       - npm install
       - npm run build
+  post_build:
+    commands:
+      - npm deploy
 artifacts:
   files:
     build/**/*
