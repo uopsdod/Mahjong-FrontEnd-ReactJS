@@ -10,7 +10,7 @@
   "scripts": {
     "start": "react-scripts start",
     "build": "react-scripts build",
-    "deploy": "aws cp build s3://mahjong-frontend-reactjs/ --recursive",
+    "deploy": "aws s3 cp build/  s3://mahjong-frontend-reactjs/ --recursive",
     "test": "react-scripts test",
     "eject": "react-scripts eject"
   },
