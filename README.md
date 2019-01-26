@@ -5,6 +5,8 @@
 
 Get your React front-end projct up and running with very fundamental rules implemented.
 
+#### update: AWS Codepipeline is built.
+
 ### `Phase 2 - Front-End`
 
 Decorate your page with pictures and css 
