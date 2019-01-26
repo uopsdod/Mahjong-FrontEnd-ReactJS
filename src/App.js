@@ -13,6 +13,37 @@ const divStyle = {
   alignItems: 'center'
 };
 
+// const allTiles = [
+// 	'circle1','circle2','circle3','circle4','circle5','circle6','circle7','circle8','circle9'
+//    ,'circle1','circle2','circle3','circle4','circle5','circle6','circle7','circle8','circle9'
+//    ,'circle1','circle2','circle3','circle4','circle5','circle6','circle7','circle8','circle9'
+//    ,'circle1','circle2','circle3','circle4','circle5','circle6','circle7','circle8','circle9'
+//    ,'bamboo1','bamboo2','bamboo3','bamboo4','bamboo5','bamboo6','bamboo7','bamboo8','bamboo9'
+//    ,'bamboo1','bamboo2','bamboo3','bamboo4','bamboo5','bamboo6','bamboo7','bamboo8','bamboo9'
+//    ,'bamboo1','bamboo2','bamboo3','bamboo4','bamboo5','bamboo6','bamboo7','bamboo8','bamboo9'
+//    ,'bamboo1','bamboo2','bamboo3','bamboo4','bamboo5','bamboo6','bamboo7','bamboo8','bamboo9'
+//    ,'character1','character2','character3','character4','character5','character6','character7','character8','character9'
+//    ,'character1','character2','character3','character4','character5','character6','character7','character8','character9'
+//    ,'character1','character2','character3','character4','character5','character6','character7','character8','character9'
+//    ,'character1','character2','character3','character4','character5','character6','character7','character8','character9'
+//    ,'eastwind', 'southwind', 'westwind', 'northwind'
+//    ,'eastwind', 'southwind', 'westwind', 'northwind'
+//    ,'eastwind', 'southwind', 'westwind', 'northwind'
+//    ,'eastwind', 'southwind', 'westwind', 'northwind'
+//    ,'whitedragon', 'greendragon', 'reddragon'
+//    ,'whitedragon', 'greendragon', 'reddragon'
+//    ,'whitedragon', 'greendragon', 'reddragon'
+//    ,'whitedragon', 'greendragon', 'reddragon'
+//    ,'plumflower', 'orchidflower', 'chrysanthemumflower','bambooflower'
+//    ,'springseason', 'summerseason', 'autumnseason', 'winterseason'
+// ]
+
+const allTiles = [
+	'whitedragon'
+	// ,'character1','character2'
+	// ,'character1','character2','character3','character4','character5','character6','character7','character8','character9'
+]
+
 let playerInitialTileNumber = 16;
 
 class App extends Component {
@@ -35,37 +66,10 @@ class GameEnv extends Component {
 		this.state = {
 			announcement: ""
 			,windRound: "eastWindRound" // eastWindRound, sourthWindRound, westWindRound, NorthWindRound  
-			,host: "0" // 
-			// ,remainingTiles: [
-			// 	 'circle1','circle2','circle3','circle4','circle5','circle6','circle7','circle8','circle9'
-			// 	,'circle1','circle2','circle3','circle4','circle5','circle6','circle7','circle8','circle9'
-			// 	,'circle1','circle2','circle3','circle4','circle5','circle6','circle7','circle8','circle9'
-			// 	,'circle1','circle2','circle3','circle4','circle5','circle6','circle7','circle8','circle9'
-			// 	,'bamboo1','bamboo2','bamboo3','bamboo4','bamboo5','bamboo6','bamboo7','bamboo8','bamboo9'
-			// 	,'bamboo1','bamboo2','bamboo3','bamboo4','bamboo5','bamboo6','bamboo7','bamboo8','bamboo9'
-			// 	,'bamboo1','bamboo2','bamboo3','bamboo4','bamboo5','bamboo6','bamboo7','bamboo8','bamboo9'
-			// 	,'bamboo1','bamboo2','bamboo3','bamboo4','bamboo5','bamboo6','bamboo7','bamboo8','bamboo9'
-			// 	,'character1','character2','character3','character4','character5','character6','character7','character8','character9'
-			// 	,'character1','character2','character3','character4','character5','character6','character7','character8','character9'
-			// 	,'character1','character2','character3','character4','character5','character6','character7','character8','character9'
-			// 	,'character1','character2','character3','character4','character5','character6','character7','character8','character9'
-			// 	,'eastwind', 'southwind', 'westwind', 'northwind'
-			// 	,'eastwind', 'southwind', 'westwind', 'northwind'
-			// 	,'eastwind', 'southwind', 'westwind', 'northwind'
-			// 	,'eastwind', 'southwind', 'westwind', 'northwind'
-			// 	,'whitedragon', 'greendragon', 'reddragon'
-			// 	,'whitedragon', 'greendragon', 'reddragon'
-			// 	,'whitedragon', 'greendragon', 'reddragon'
-			// 	,'whitedragon', 'greendragon', 'reddragon'
-			// 	,'plumflower', 'orchidflower', 'chrysanthemumflower','bambooflower'
-			// 	,'springseason', 'summerseason', 'autumnseason', 'winterseason'
-			// ]
-			,remainingTiles: [
-				'whitedragon'
-				// ,'character1','character2','character3','character4','character5','character6','character7','character8','character9'
-			] // testing 
+			,remainingTiles: allTiles.slice(0) 
 			,discardedPool: [7,7,7,'J']
 			,playerIdOrder: ["0","1"]
+			,host: "0" // 0->(playerIdOrder.length-1)
 			,playerTurn: [false, false] // you'll get playerOrder first and then update this flag to know current PlayerTurn
 			,PlayerInfo000: { //we probably can make it as a JS class 
 				id: "0"
@@ -108,17 +112,25 @@ class GameEnv extends Component {
 		this.initiateGame();
 	}
 
-	initiateGame(e){
-		console.log("GameEnv.initiateGame() called ");
+	initiateGame(){
+		console.log("GameEnv.initiateGame() called ****************** ");
 
-		// give tiles to each player randomly 
-		if (!isTestMode_g){
-			this.assignTiles();
-		}
+		// restore remaining tiles
+		console.log("GameEnv.initiateGame() allTiles: ", allTiles);
+		let remainingTiles = this.state.remainingTiles.slice(0);
+		remainingTiles = allTiles.slice(0);
+		// remainingTiles.push("Xtile");
+		console.log("GameEnv.initiateGame() remainingTiles: ", remainingTiles);
+		this.setState({remainingTiles}, ()=>{
+			console.log("GameEnv.initiateGame() this.state.remainingTiles: ", this.state.remainingTiles);
+			// give tiles to each player randomly 
+			if (!isTestMode_g){
+				this.assignTiles();
+			}
 
-		// start the first turn
-		let initialTurnIndex = 0;
-		this.changeTurn(null, initialTurnIndex);
+			console.log("GameEnv.initiateGame() host(nextTurnIndex): ", this.state.host);
+			this.changeTurn(null, this.state.host);
+		});
 	}	
 
 	assignTiles(){
@@ -255,7 +267,7 @@ class GameEnv extends Component {
 
 		if (isWin) {
 			console.log("GameEnv.claimWin() a win here!");
-			this.endGame("Player " + player.name + " Won!");
+			this.endGame("Player " + player.name + " Won");
 		}else{
 			console.log("GameEnv.claimWin() false win claim ... ");
 			this.endGame("Player " + player.name + " false win claim ...");
@@ -390,21 +402,35 @@ class GameEnv extends Component {
 		return isWin;
 	}
 
-	endGame(msg){
+	endGame(announcement){
 		console.log("GameEnv.endGame() called");
-		let announcement = msg;
-		this.setState({announcement});
 
 		let playerTurn = this.state.playerTurn.slice(0);
 		playerTurn[0] = false;
 		playerTurn[1] = false;
 		this.setState({playerTurn});
 
+
 		let PlayerInfo000 = Object.assign({}, this.state.PlayerInfo000);    //creating copy of object
 		this.setState({PlayerInfo000});
 		let PlayerInfo001 = Object.assign({}, this.state.PlayerInfo001);    //creating copy of object
 		this.setState({PlayerInfo001});
 
+		
+		if (Number(this.state.host) + 1 < this.state.playerIdOrder.length) {
+			let host = this.state.host;
+			host = Number(host) + 1;
+			console.log("host: ", host);
+			this.setState({host}, ()=>{
+				this.initiateGame();
+			});
+
+			announcement = announcement + " and Start a new round.";
+		}else {
+			announcement = announcement + " and Game is over.";
+		}
+
+		this.setState({announcement});
 	}
 
 	/////////// Util section starts /////////////
@@ -420,10 +446,12 @@ class GameEnv extends Component {
 		let currentTurnIndex = this.getCurrentTurnIndex();
 		const playerTurn = this.state.playerTurn.slice(0);
 		let nextTurnIndex;
-		if (currentTurnIndex + 2 > playerTurn.length) {
-			nextTurnIndex = 0;
-		}else{
+		console.log("getNextTurnIndex() called - currentTurnIndex: " , currentTurnIndex);
+		console.log("getNextTurnIndex() called - playerTurn.length: " , playerTurn.length);
+		if (Number(currentTurnIndex) + 1 < playerTurn.length) {
 			nextTurnIndex = currentTurnIndex + 1;
+		}else{
+			nextTurnIndex = 0;
 		}
 		return nextTurnIndex;
 	}
@@ -478,7 +506,6 @@ class GameEnv extends Component {
 				<br/>
 				<div style={divStyle}>
 					<Player 
-						ref={(child) => { this.PlayerInfo000 = child; }}
 						flowers={this.state.PlayerInfo000.flowers}
 						seasons={this.state.PlayerInfo000.seasons}
 						factDownTiles={this.state.PlayerInfo000.factDownTiles}
@@ -496,7 +523,6 @@ class GameEnv extends Component {
 				</div>
 				<div>
 					<Player 
-						ref={(child) => { this.PlayerInfo001 = child; }}
 						flowers={this.state.PlayerInfo001.flowers}
 						seasons={this.state.PlayerInfo001.seasons}
 						factDownTiles={this.state.PlayerInfo001.factDownTiles}
