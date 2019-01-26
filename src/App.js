@@ -513,6 +513,7 @@ class GameEnv extends Component {
 						hand={this.state.PlayerInfo000.hand} 
 						name={this.state.PlayerInfo000.name} 
 						money={this.state.PlayerInfo000.money}
+						hostId={this.state.playerIdOrder[this.state.host]}
 
 						putTileToDiscardedPool={this.putTileToDiscardedPool}
 						getCurrentPlayer={this.getCurrentPlayer}
@@ -530,6 +531,7 @@ class GameEnv extends Component {
 						hand={this.state.PlayerInfo001.hand} 
 						name={this.state.PlayerInfo001.name} 
 						money={this.state.PlayerInfo001.money}
+						hostId={this.state.playerIdOrder[this.state.host]}
 
 						putTileToDiscardedPool={this.putTileToDiscardedPool}
 						getCurrentPlayer={this.getCurrentPlayer}
@@ -562,11 +564,22 @@ class Player extends Component {
 
 	render() {
 		console.log("Player.render() called");
+		let currentPlayer = this.props.getCurrentPlayer();
 		let hand = this.props.hand.map((item,index) => <span key={index}><a index={index} >{item}</a><span>,</span></span>);
 		let claimWin = <a >Claim Win</a>;
-		let currentPlayer = this.props.getCurrentPlayer();
+		let name = this.props.name;
+
+		// check if the change is to applied to the this player
 		if (currentPlayer && currentPlayer.name === this.props.name) {
+			console.log("Player.render() called - this.props.hostId: ", this.props.hostId);
+			console.log("Player.render() called - currentPlayer: ", currentPlayer);
+			// change the name with host
+			if (currentPlayer && currentPlayer.id && currentPlayer.id === this.props.hostId) {
+				name = this.props.name + "(Host)";
+			}
+			// enable discard-tile function
 			hand = this.props.hand.map((item,index) => <span key={index}><a href="#" index={index} onClick={this.putTileToDiscardedPool}>{item}</a><span>,</span></span>);
+			// enable claim-win function 
 			claimWin = <a href="#" onClick={this.claimWin}>Claim Win</a>;
 		}
 
@@ -585,7 +598,7 @@ class Player extends Component {
 				<br/>
 				Action: {claimWin}
 				<br/>
-				Name: {this.props.name}
+				Name: {name}
 				<br/>
 				$: {this.props.money}
 			</div>
