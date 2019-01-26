@@ -62,6 +62,7 @@ class GameEnv extends Component {
 			// ]
 			,remainingTiles: [
 				'whitedragon'
+				// ,'character1','character2','character3','character4','character5','character6','character7','character8','character9'
 			] // testing 
 			,discardedPool: [7,7,7,'J']
 			,playerIdOrder: ["0","1"]
@@ -254,8 +255,10 @@ class GameEnv extends Component {
 
 		if (isWin) {
 			console.log("GameEnv.claimWin() a win here!");
+			this.endGame("Player " + player.name + " Won!");
 		}else{
 			console.log("GameEnv.claimWin() false win claim ... ");
+			this.endGame("Player " + player.name + " false win claim ...");
 		}
 
 	}
@@ -353,7 +356,7 @@ class GameEnv extends Component {
 		// phase 1 : a very simple conbination to win
 		if (Number(numberOfThreeConsecutiveTiles) === 5) {
 			console.log("GameEnv.isWinDeck() handToCheck[0]-handToCheck[1]: ", handToCheck[0],"-",handToCheck[1]);
-			if (Number(handToCheck[0]) === Number(handToCheck[1])) {
+			if (handToCheck[0] === handToCheck[1]) {
 				isWin = true;
 			}
 		}else if (Number(numberOfThreeConsecutiveTiles) === 4) {
