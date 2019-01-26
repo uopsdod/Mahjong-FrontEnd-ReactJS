@@ -1,11 +1,12 @@
 import React, { Component } from 'react';
 import './App.css';
 
+
 // https://www.ymimports.com/pages/how-to-play-american-mahjong#Equipment
 // http://www.dragona.com.tw/mahjong-english/
 
 const isTestMode_g = true;
-let poppedTile_g = '';
+// let poppedTile_g = '';
 
 const divStyle = {
   display: 'flex',
@@ -282,14 +283,14 @@ class GameEnv extends Component {
 			let currentNumberOfConsecutiveTile = 0;
 			
 			handToCheck.every((item, index)=>{
-				let ary = item.replace(/\'/g, '').split(/(\d+)/).filter(Boolean); // ex. convert "circle9" into ["circle",9]
+				let ary = item.replace(/'/g, '').split(/(\d+)/).filter(Boolean); // ex. convert "circle9" into ["circle",9]
 				let currentPrefix = ary[0];
 				let currentNo = Number(ary[1]); // it might be undefined
 				
 				// for tiles that are not circles, bamboos, characters, skip them
 				if (currentNo === undefined) {
 					console.log("GameEnv.isWinDeck() not a tile with number: ", currentPrefix);
-					return; // note: this will only skip one iteration; it will NOT terminate the whole foreach operation 
+					return true; // note: this will only skip one iteration; it will NOT terminate the whole foreach operation 
 				}else{
 					// check if this is a consecutive one
 					let isConsecutive = false;
@@ -302,7 +303,7 @@ class GameEnv extends Component {
 							previousNo = currentNo;
 						}else if (previousNo && (previousNo === currentNo)){ // when there are duplicate tiles
 							console.log("GameEnv.isWinDeck() skip duplicate tiles: ");
-							return; // note: this will only skip one iteration; it will NOT terminate the whole foreach operation 
+							return true; // note: this will only skip one iteration; it will NOT terminate the whole foreach operation 
 						}
 					}
 	
@@ -352,7 +353,7 @@ class GameEnv extends Component {
 		// phase 1 : a very simple conbination to win
 		if (Number(numberOfThreeConsecutiveTiles) === 5) {
 			console.log("GameEnv.isWinDeck() handToCheck[0]-handToCheck[1]: ", handToCheck[0],"-",handToCheck[1]);
-			if (handToCheck[0] == handToCheck[1]) {
+			if (Number(handToCheck[0]) === Number(handToCheck[1])) {
 				isWin = true;
 			}
 		}else if (Number(numberOfThreeConsecutiveTiles) === 4) {
@@ -425,9 +426,9 @@ class GameEnv extends Component {
 	}
 
 	getPlayerById(playerId){
-		if (playerId == 0) {
+		if (Number(playerId) === 0) {
 			return this.state.PlayerInfo000;
-		}else if (playerId == 1){
+		}else if (Number(playerId) === 1){
 			return this.state.PlayerInfo001;			
 		}
 	}
@@ -535,7 +536,7 @@ class Player extends Component {
 		let hand = this.props.hand.map((item,index) => <span key={index}><a index={index} >{item}</a><span>,</span></span>);
 		let claimWin = <a >Claim Win</a>;
 		let currentPlayer = this.props.getCurrentPlayer();
-		if (currentPlayer && currentPlayer.name == this.props.name) {
+		if (currentPlayer && currentPlayer.name === this.props.name) {
 			hand = this.props.hand.map((item,index) => <span key={index}><a href="#" index={index} onClick={this.putTileToDiscardedPool}>{item}</a><span>,</span></span>);
 			claimWin = <a href="#" onClick={this.claimWin}>Claim Win</a>;
 		}
