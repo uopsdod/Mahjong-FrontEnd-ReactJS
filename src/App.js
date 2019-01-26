@@ -494,7 +494,7 @@ class GameEnv extends Component {
 			<div>
 				Annoucement: {this.state.announcement}
 				<br/>
-				Wind Round: {this.state.windRound}
+				WindRound: {this.state.windRound}
 				<br/>
 				Host: {this.state.host}
 				<br/>
