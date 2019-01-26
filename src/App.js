@@ -574,7 +574,7 @@ class Player extends Component {
 			console.log("Player.render() called - this.props.hostId: ", this.props.hostId);
 			console.log("Player.render() called - currentPlayer: ", currentPlayer);
 			// change the name with host
-			if (currentPlayer && currentPlayer.id && currentPlayer.id === this.props.hostId) {
+			if (currentPlayer && currentPlayer.id === this.props.hostId) {
 				name = this.props.name + "(Host)";
 			}
 			// enable discard-tile function
