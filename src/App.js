@@ -5,6 +5,7 @@ import './App.css';
 // https://www.ymimports.com/pages/how-to-play-american-mahjong#Equipment
 // http://www.dragona.com.tw/mahjong-english/
 
+const isLocalMode = false;
 const isTestMode_g = true;
 // let poppedTile_g = '';
 
@@ -57,12 +58,14 @@ class App extends Component {
 class GameEnv extends Component {
 	constructor(props){
 		super(props);
+		this.connectToWS = this.connectToWS.bind(this);
 		this.initiateGame = this.initiateGame.bind(this);
 		this.putTileToDiscardedPool = this.putTileToDiscardedPool.bind(this);
 		this.getCurrentPlayer = this.getCurrentPlayer.bind(this);
 		this.claimWin = this.claimWin.bind(this);
 		this.isWinDeck = this.isWinDeck.bind(this);
 		
+		/** TODO: all these state should be kept on server and clients communicate via websockets **/
 		this.state = {
 			announcement: ""
 			,windRound: "eastWindRound" // eastWindRound, sourthWindRound, westWindRound, NorthWindRound  
@@ -108,8 +111,41 @@ class GameEnv extends Component {
 	
 	componentDidMount() {
 		console.log("GameEnv.componentDidMount() called ");
-		// initiate a game 
-		this.initiateGame();
+
+		if (isLocalMode) {
+			this.initiateGame();
+		}else{
+			this.connectToWS();
+		}
+		
+	}
+
+	// ref: https://keyholesoftware.com/2017/04/10/websockets-with-spring-boot/
+	connectToWS(){
+		console.log("window.location.host: " + window.location.host);
+		let host = "localhost:8080";
+		var socket = new WebSocket('ws://' + host + '/my-websocket-endpoint');
+ 
+		// Add an event listener for when a connection is open
+		socket.onopen = function() {
+		  console.log('WebSocket connection opened. Ready to send messages.');
+		 
+		  // Send a message to the server
+		  socket.send('Hello, from WebSocket client!');
+		};
+		 
+		// Add an event listener for when a message is received from the server
+		socket.onmessage = function(msg) {
+		  	console.log('Message received from server: ' , msg);
+			console.log('Message received from server data: ' , msg.data);
+
+			if (msg.data.toUpperCase() == 'initiateGame'.toUpperCase()){
+				console.log(msg.data + " matched");
+				// initiate a game 
+				this.initiateGame();
+			}
+
+		}.bind(this); // ref: https://stackoverflow.com/questions/44072078/calling-function-in-onopen-event-of-websocket-in-react-js-component
 	}
 
 	initiateGame(){
