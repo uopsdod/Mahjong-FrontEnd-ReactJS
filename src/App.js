@@ -117,8 +117,8 @@ class GameEnv extends Component {
 
 		// restore remaining tiles
 		console.log("GameEnv.initiateGame() allTiles: ", allTiles);
-		let remainingTiles = this.state.remainingTiles.slice(0);
-		remainingTiles = allTiles.slice(0);
+		// let remainingTiles = this.state.remainingTiles.slice(0);
+		let remainingTiles = allTiles.slice(0);
 		// remainingTiles.push("Xtile");
 		console.log("GameEnv.initiateGame() remainingTiles: ", remainingTiles);
 		this.setState({remainingTiles}, ()=>{
