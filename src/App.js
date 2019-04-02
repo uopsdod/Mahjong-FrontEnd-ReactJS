@@ -57,6 +57,7 @@ class App extends Component {
 		super(props);
 		this.joinGame = this.joinGame.bind(this);
 		this.connectToWS = this.connectToWS.bind(this);
+		this.endGame = this.endGame.bind(this);
 
 		this.state = {
 		    isInitiateGame : false
@@ -66,7 +67,7 @@ class App extends Component {
 
 	joinGame(event)
 	{
-		console.log("Button.joinGame() called");
+		console.log("joinGame() called");
 
 		/** initiate websocket client session **/
         this.connectToWS();
@@ -108,13 +109,30 @@ class App extends Component {
 		}.bind(this); // ref: https://stackoverflow.com/questions/44072078/calling-function-in-onopen-event-of-websocket-in-react-js-component
 	}
 
+	endGame(){
+	    console.log("endGame() called");
+	    if (socket) {
+            socket.close();
+            socket = null;
+            this.setState({
+                isInitiateGame : false
+            });
+            console.log("endGame() socket closed");
+	    }
+	}
+
 	render() {
 		return (
 		    <div>
-                <Button words="Join Game" handleClick={this.joinGame}/>
+		        {!this.state.isInitiateGame &&
+                    <Button words="Join Game" handleClick={this.joinGame}/>
+                }
+                {this.state.isInitiateGame &&
+                    <Button words="End Game" handleClick={this.endGame}/>
+                }
                 <br/>
                 {this.state.isInitiateGame &&
-                   <GameEnv />
+                    <GameEnv />
                 }
 
             </div>
