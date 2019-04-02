@@ -1,7 +1,6 @@
 import React, { Component } from 'react';
 import './App.css';
 
-
 // https://www.ymimports.com/pages/how-to-play-american-mahjong#Equipment
 // http://www.dragona.com.tw/mahjong-english/
 
@@ -47,10 +46,75 @@ const allTiles = [
 
 let playerInitialTileNumber = 16;
 
+let socket;
+
 class App extends Component {
+
+	constructor(props){
+		super(props);
+		this.joinGame = this.joinGame.bind(this);
+		this.connectToWS = this.connectToWS.bind(this);
+
+		this.state = {
+		    isInitiateGame : false
+		}
+
+	}
+
+	joinGame(event)
+	{
+		console.log("Button.joinGame() called");
+
+		/** initiate websocket client session **/
+        this.connectToWS();
+
+	}
+
+	// ref: https://keyholesoftware.com/2017/04/10/websockets-with-spring-boot/
+	connectToWS(){
+		console.log("window.location.host: " + window.location.host);
+		let host = "localhost:8080";
+		socket = new WebSocket('ws://' + host + '/my-websocket-endpoint');
+
+		// Add an event listener for when a connection is open
+		socket.onopen = function() {
+		  console.log('WebSocket connection opened. Ready to send messages.');
+
+		  // Send a message to the server
+		  socket.send('Hello, from WebSocket client!');
+		};
+
+		// Add an event listener for when a message is received from the server
+		socket.onmessage = function(msg) {
+		  	console.log('Message received from server: ' , msg);
+			console.log('Message received from server data: ' , msg.data);
+
+			if (msg.data.toUpperCase() == 'initiateGame'.toUpperCase()){
+				console.log(msg.data + " matched");
+				// TODO: get roomId from server
+				// TODO: get randomly shuffled decks from server
+				// TODO: get randomly assigned deck for each player from server
+				// TODO: basically, get every information that is now in the GameEnv class from the server
+
+
+                this.setState({
+                    isInitiateGame : true
+                });
+			}
+
+		}.bind(this); // ref: https://stackoverflow.com/questions/44072078/calling-function-in-onopen-event-of-websocket-in-react-js-component
+	}
+
 	render() {
 		return (
-			<GameEnv />
+		    <div>
+                <Button words="Join Game" handleClick={this.joinGame}/>
+                <br/>
+                {this.state.isInitiateGame &&
+                   <GameEnv />
+                }
+
+            </div>
 		);
 	}
 }
@@ -58,7 +122,6 @@ class App extends Component {
 class GameEnv extends Component {
 	constructor(props){
 		super(props);
-		this.connectToWS = this.connectToWS.bind(this);
 		this.initiateGame = this.initiateGame.bind(this);
 		this.putTileToDiscardedPool = this.putTileToDiscardedPool.bind(this);
 		this.getCurrentPlayer = this.getCurrentPlayer.bind(this);
@@ -111,42 +174,9 @@ class GameEnv extends Component {
 	
 	componentDidMount() {
 		console.log("GameEnv.componentDidMount() called ");
-
-		if (isLocalMode) {
-			this.initiateGame();
-		}else{
-			this.connectToWS();
-		}
-		
+		this.initiateGame();
 	}
 
-	// ref: https://keyholesoftware.com/2017/04/10/websockets-with-spring-boot/
-	connectToWS(){
-		console.log("window.location.host: " + window.location.host);
-		let host = "localhost:8080";
-		var socket = new WebSocket('ws://' + host + '/my-websocket-endpoint');
- 
-		// Add an event listener for when a connection is open
-		socket.onopen = function() {
-		  console.log('WebSocket connection opened. Ready to send messages.');
-		 
-		  // Send a message to the server
-		  socket.send('Hello, from WebSocket client!');
-		};
-		 
-		// Add an event listener for when a message is received from the server
-		socket.onmessage = function(msg) {
-		  	console.log('Message received from server: ' , msg);
-			console.log('Message received from server data: ' , msg.data);
-
-			if (msg.data.toUpperCase() == 'initiateGame'.toUpperCase()){
-				console.log(msg.data + " matched");
-				// initiate a game 
-				this.initiateGame();
-			}
-
-		}.bind(this); // ref: https://stackoverflow.com/questions/44072078/calling-function-in-onopen-event-of-websocket-in-react-js-component
-	}
 
 	initiateGame(){
 		console.log("GameEnv.initiateGame() called ****************** ");
@@ -528,6 +558,7 @@ class GameEnv extends Component {
 		console.log("GameEnv.render() called ");
 		return (
 			<div>
+			    <br/>
 				Annoucement: {this.state.announcement}
 				<br/>
 				WindRound: {this.state.windRound}
@@ -642,6 +673,8 @@ class Player extends Component {
 	}	
 }
 
+/////////// Spaces /////////////
+
 class Spaces extends Component {
 	render() {
 		return (
@@ -649,6 +682,29 @@ class Spaces extends Component {
 		);
 	}
 }
+
+/////////// Spaces /////////////
+
+/////////// Button /////////////
+var buttonStyle = {
+  margin: '10px 10px 10px 0'
+};
+
+class Button extends Component {
+
+	render() {
+		return (
+        <button className="btn btn-default"
+                style={buttonStyle}
+                onClick={this.props.handleClick}>
+
+                {this.props.words}
+
+        </button>
+		);
+	}
+}
+/////////// Button /////////////
 
 
 export default App;
