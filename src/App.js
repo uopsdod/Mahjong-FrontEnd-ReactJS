@@ -1,6 +1,8 @@
 import React, { Component } from 'react';
 import './App.css';
 import Button from './Button';
+import Spaces from './Spaces';
+
 
 // https://www.ymimports.com/pages/how-to-play-american-mahjong#Equipment
 // http://www.dragona.com.tw/mahjong-english/
@@ -673,18 +675,6 @@ class Player extends Component {
 		);
 	}	
 }
-
-/////////// Spaces /////////////
-
-class Spaces extends Component {
-	render() {
-		return (
-			<span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</span>
-		);
-	}
-}
-
-/////////// Spaces /////////////
 
 
 export default App;
