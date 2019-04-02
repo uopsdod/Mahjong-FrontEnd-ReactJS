@@ -1,5 +1,6 @@
 import React, { Component } from 'react';
 import './App.css';
+import Button from './Button';
 
 // https://www.ymimports.com/pages/how-to-play-american-mahjong#Equipment
 // http://www.dragona.com.tw/mahjong-english/
@@ -684,27 +685,6 @@ class Spaces extends Component {
 }
 
 /////////// Spaces /////////////
-
-/////////// Button /////////////
-var buttonStyle = {
-  margin: '10px 10px 10px 0'
-};
-
-class Button extends Component {
-
-	render() {
-		return (
-        <button className="btn btn-default"
-                style={buttonStyle}
-                onClick={this.props.handleClick}>
-
-                {this.props.words}
-
-        </button>
-		);
-	}
-}
-/////////// Button /////////////
 
 
 export default App;
