@@ -91,15 +91,22 @@ class App extends Component {
 		socket.onmessage = function(msg) {
 		  	console.log('onmessage() Message received from server: ' , msg);
 			console.log('onmessage() Message received from server data: ' , msg.data);
+            var data = JSON.parse(msg.data);
 
-            if (msg.data.toUpperCase() == 'joingame_done'.toUpperCase()){
+            if (data.event.toUpperCase() == 'joingame_done'.toUpperCase()){
+                console.log('onmessage() ' + data.event + " matched");
                 this.setState({
                     isJoiningGame : true
                 });
             }
 
-			if (msg.data.toUpperCase() == 'initiateGame'.toUpperCase()){
-				console.log('onmessage() ' + msg.data + " matched");
+            if (data.event.toUpperCase() == 'endgame_done'.toUpperCase()){
+                console.log('onmessage() ' + data.event + " matched");
+                this.endGame();
+            }
+
+			if (data.event.toUpperCase() == 'initiateGame'.toUpperCase()){
+				console.log('onmessage() ' + data.event + " matched");
 				// TODO: get roomId from server
 				// TODO: get randomly shuffled decks from server
 				// TODO: get randomly assigned deck for each player from server
@@ -123,8 +130,19 @@ class App extends Component {
 	    }
     }
 
+	requestEndGame = () => {
+	    console.log("requestEndGame() called");
+
+	    let endGameEvent = {
+	        playerId: '123'
+	        ,event: 'endgame'
+	    }
+
+	    socket.send(JSON.stringify(endGameEvent));
+	}
+
 	endGame = () => {
-	    console.log("endGame() called");
+        console.log("endGame() called");
 	    this.close();
 
         this.setState({
@@ -153,7 +171,7 @@ class App extends Component {
                     <Button words="Stop Join Game" handleClick={this.stopJoinGame}/>
                 }
                 {this.state.isInitiateGame &&
-                    <Button words="End Game" handleClick={this.endGame}/>
+                    <Button words="End Game" handleClick={this.requestEndGame}/>
                 }
                 <br/>
                 {this.state.isInitiateGame &&
