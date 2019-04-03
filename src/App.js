@@ -58,6 +58,7 @@ class App extends Component {
 
 		this.state = {
 		    isInitiateGame : false
+		    ,isJoiningGame : false
 		}
 
 	}
@@ -73,13 +74,14 @@ class App extends Component {
 
 	// ref: https://keyholesoftware.com/2017/04/10/websockets-with-spring-boot/
 	connectToWS = () => {
-		console.log("window.location.host: " + window.location.host);
+	    console.log("connectToWS() called");
+		console.log("connectToWS() window.location.host: " + window.location.host);
 		let host = "localhost:8080";
 		socket = new WebSocket('ws://' + host + '/my-websocket-endpoint');
 
 		// Add an event listener for when a connection is open
 		socket.onopen = function() {
-		  console.log('WebSocket connection opened. Ready to send messages.');
+		  console.log('onopen() WebSocket connection opened. Ready to send messages.');
 
 		  // Send a message to the server
 		  socket.send('Hello, from WebSocket client!');
@@ -87,11 +89,17 @@ class App extends Component {
 
 		// Add an event listener for when a message is received from the server
 		socket.onmessage = function(msg) {
-		  	console.log('Message received from server: ' , msg);
-			console.log('Message received from server data: ' , msg.data);
+		  	console.log('onmessage() Message received from server: ' , msg);
+			console.log('onmessage() Message received from server data: ' , msg.data);
+
+            if (msg.data.toUpperCase() == 'joingame_done'.toUpperCase()){
+                this.setState({
+                    isJoiningGame : true
+                });
+            }
 
 			if (msg.data.toUpperCase() == 'initiateGame'.toUpperCase()){
-				console.log(msg.data + " matched");
+				console.log('onmessage() ' + msg.data + " matched");
 				// TODO: get roomId from server
 				// TODO: get randomly shuffled decks from server
 				// TODO: get randomly assigned deck for each player from server
@@ -106,23 +114,43 @@ class App extends Component {
 		}.bind(this); // ref: https://stackoverflow.com/questions/44072078/calling-function-in-onopen-event-of-websocket-in-react-js-component
 	}
 
-	endGame = () => {
-	    console.log("endGame() called");
-	    if (socket) {
+    close = () => {
+        console.log("close() called");
+        if (socket) {
             socket.close();
             socket = null;
-            this.setState({
-                isInitiateGame : false
-            });
-            console.log("endGame() socket closed");
+            console.log("close() socket closed");
 	    }
+    }
+
+	endGame = () => {
+	    console.log("endGame() called");
+	    this.close();
+
+        this.setState({
+            isInitiateGame : false
+        });
+
 	}
+
+    stopJoinGame = () => {
+        console.log("stopJoinGame() called");
+        this.close();
+
+        this.setState({
+            isJoiningGame : false
+        });
+    }
 
 	render() {
 		return (
 		    <div>
-		        {!this.state.isInitiateGame &&
+		        {!this.state.isJoiningGame &&
                     <Button words="Join Game" handleClick={this.joinGame}/>
+                }
+                {this.state.isJoiningGame &&
+                    !this.state.isInitiateGame &&
+                    <Button words="Stop Join Game" handleClick={this.stopJoinGame}/>
                 }
                 {this.state.isInitiateGame &&
                     <Button words="End Game" handleClick={this.endGame}/>
