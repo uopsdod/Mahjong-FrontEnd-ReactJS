@@ -55,9 +55,6 @@ class App extends Component {
 
 	constructor(props){
 		super(props);
-		this.joinGame = this.joinGame.bind(this);
-		this.connectToWS = this.connectToWS.bind(this);
-		this.endGame = this.endGame.bind(this);
 
 		this.state = {
 		    isInitiateGame : false
@@ -65,7 +62,7 @@ class App extends Component {
 
 	}
 
-	joinGame(event)
+	joinGame = (event) =>
 	{
 		console.log("joinGame() called");
 
@@ -75,7 +72,7 @@ class App extends Component {
 	}
 
 	// ref: https://keyholesoftware.com/2017/04/10/websockets-with-spring-boot/
-	connectToWS(){
+	connectToWS = () => {
 		console.log("window.location.host: " + window.location.host);
 		let host = "localhost:8080";
 		socket = new WebSocket('ws://' + host + '/my-websocket-endpoint');
@@ -109,7 +106,7 @@ class App extends Component {
 		}.bind(this); // ref: https://stackoverflow.com/questions/44072078/calling-function-in-onopen-event-of-websocket-in-react-js-component
 	}
 
-	endGame(){
+	endGame = () => {
 	    console.log("endGame() called");
 	    if (socket) {
             socket.close();
@@ -143,12 +140,7 @@ class App extends Component {
 class GameEnv extends Component {
 	constructor(props){
 		super(props);
-		this.initiateGame = this.initiateGame.bind(this);
-		this.putTileToDiscardedPool = this.putTileToDiscardedPool.bind(this);
-		this.getCurrentPlayer = this.getCurrentPlayer.bind(this);
-		this.claimWin = this.claimWin.bind(this);
-		this.isWinDeck = this.isWinDeck.bind(this);
-		
+
 		/** TODO: all these state should be kept on server and clients communicate via websockets **/
 		this.state = {
 			announcement: ""
@@ -193,13 +185,13 @@ class GameEnv extends Component {
 		
 	}	
 	
-	componentDidMount() {
+	componentDidMount = () => {
 		console.log("GameEnv.componentDidMount() called ");
 		this.initiateGame();
 	}
 
 
-	initiateGame(){
+	initiateGame = () => {
 		console.log("GameEnv.initiateGame() called ****************** ");
 
 		// restore remaining tiles
@@ -220,7 +212,7 @@ class GameEnv extends Component {
 		});
 	}	
 
-	assignTiles(){
+	assignTiles = () => {
 		let remainingTiles = this.state.remainingTiles.slice(0);
 		console.log("GameEnv.remainingTiles() hand now: ", remainingTiles);
 
@@ -237,7 +229,7 @@ class GameEnv extends Component {
 		console.log("GameEnv.remainingTiles() hand now: ", remainingTiles);
 	}
 
-	assignTilesToPlayer(player, remainingTiles){
+	assignTilesToPlayer = (player, remainingTiles) => {
 		for (let i = 0; i < playerInitialTileNumber; i++) {
 			let poppedIndex = this.getRandomIndexFromArray(remainingTiles);
 			let poppedTile = remainingTiles[poppedIndex];
@@ -253,7 +245,7 @@ class GameEnv extends Component {
 
 	}
 
-	changeTurn(currentTurnIndex, nextTurnIndex){
+	changeTurn = (currentTurnIndex, nextTurnIndex) => {
 		console.log("GameEnv.changeTurn() called ");
 		let playerTurn = this.state.playerTurn.slice(0);
 		if (typeof currentTurnIndex !== 'undefined') {
@@ -269,7 +261,7 @@ class GameEnv extends Component {
 		
 	}
 	
-	startTurn(player){
+	startTurn = (player) => {
 		console.log("GameEnv.startTurn() called ");
 		// get a new tile from the remaining tile
 		let remainingTiles = this.state.remainingTiles.slice(0);
@@ -297,7 +289,7 @@ class GameEnv extends Component {
 
 	///////////////////////////////////// another flow starts below /////////////////////////////////////
 
-	putTileToDiscardedPool(event){
+	putTileToDiscardedPool = (event) => {
 		console.log("GameEnv.putTileToDiscardedPool() called");
 		event.preventDefault();
 
@@ -344,7 +336,7 @@ class GameEnv extends Component {
 		this.changeTurn(currentTurnIndex, nextTurnIndex);
 	}
 
-	claimWin(event){
+	claimWin = (event) => {
 		console.log("GameEnv.claimWin() called");
 		event.preventDefault();
 
@@ -362,7 +354,7 @@ class GameEnv extends Component {
 
 	}
 
-	isWinDeck(hand){
+	isWinDeck = (hand) => {
 		console.log("GameEnv.isWinDeck() called ");
 
 		// temporarily sort the hand 
@@ -489,7 +481,7 @@ class GameEnv extends Component {
 		return isWin;
 	}
 
-	endGame(announcement){
+	endGame = (announcement) => {
 		console.log("GameEnv.endGame() called");
 
 		let playerTurn = this.state.playerTurn.slice(0);
@@ -521,7 +513,7 @@ class GameEnv extends Component {
 	}
 
 	/////////// Util section starts /////////////
-	getCurrentTurnIndex(){
+	getCurrentTurnIndex = () => {
 		const playerTurn = this.state.playerTurn.slice(0);
 		let currentTurnIndex = playerTurn.findIndex(function(ele){
 			return ele === true;
@@ -529,7 +521,7 @@ class GameEnv extends Component {
 		return currentTurnIndex;
 	}
 
-	getNextTurnIndex(){
+	getNextTurnIndex = () => {
 		let currentTurnIndex = this.getCurrentTurnIndex();
 		const playerTurn = this.state.playerTurn.slice(0);
 		let nextTurnIndex;
@@ -543,7 +535,7 @@ class GameEnv extends Component {
 		return nextTurnIndex;
 	}
 
-	getPlayerById(playerId){
+	getPlayerById = (playerId) => {
 		if (Number(playerId) === 0) {
 			return this.state.PlayerInfo000;
 		}else if (Number(playerId) === 1){
@@ -551,25 +543,25 @@ class GameEnv extends Component {
 		}
 	}
 
-	getCurrentPlayer(){
+	getCurrentPlayer = () => {
 		let currentTurnIndex = this.getCurrentTurnIndex();
 		let currentPlayerId = this.state.playerIdOrder[currentTurnIndex];
 		let currentPlayer = this.getPlayerById(currentPlayerId);
 		return currentPlayer;
 	}
 
-	getNextPlayer(){
+	getNextPlayer = () => {
 		let nextTurnIndex = this.getNextTurnIndex();
 		let nextPlayerId = this.state.playerIdOrder[nextTurnIndex];
 		let nextPlayer = this.getPlayerById(nextPlayerId);
 		return nextPlayer;
 	}
 
-	getRandomIndexFromArray(ary){
+	getRandomIndexFromArray = (ary) => {
 		return Math.floor(Math.random()*ary.length);
 	}
 
-	removeItemFromArrayByIndex(ary, index){
+	removeItemFromArrayByIndex = (ary, index) => {
 		ary.splice(index,1);
 	}
 	
@@ -635,17 +627,15 @@ class Player extends Component {
 
 	constructor(props){
 		super(props);		
-		this.putTileToDiscardedPool = this.putTileToDiscardedPool.bind(this);
-		this.claimWin = this.claimWin.bind(this);
 	}
 
-	putTileToDiscardedPool(event)
+	putTileToDiscardedPool = (event) =>
 	{
 		console.log("Player.putTileToDiscardedPool() called");
 		return this.props.putTileToDiscardedPool(event);
 	}
 
-	claimWin(event){
+	claimWin = (event) => {
 		console.log("Player.claimWin() called");
 		return this.props.claimWin(event);
 	}
