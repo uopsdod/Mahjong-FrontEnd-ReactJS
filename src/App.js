@@ -16,6 +16,8 @@ const divStyle = {
   alignItems: 'center'
 };
 
+let player_g;
+
 // const allTiles = [
 // 	'circle1','circle2','circle3','circle4','circle5','circle6','circle7','circle8','circle9'
 //    ,'circle1','circle2','circle3','circle4','circle5','circle6','circle7','circle8','circle9'
@@ -81,8 +83,9 @@ class App extends Component {
 
 		// Add an event listener for when a connection is open
 		socket.onopen = function() {
-		  console.log('onopen() WebSocket connection opened. Ready to send messages.');
-		};
+		    console.log('onopen() WebSocket connection opened. Ready to send messages.');
+		    this.requestJoinGame();
+		}.bind(this);
 
 		// Add an event listener for when a message is received from the server
 		socket.onmessage = function(msg) {
@@ -92,6 +95,9 @@ class App extends Component {
 
             if (data.event.toUpperCase() == 'joingame_done'.toUpperCase()){
                 console.log('onmessage() ' + data.event + " matched");
+                console.log('onmessage() data.player: ' , data.player);
+                player_g = data.player;
+
                 this.setState({
                     isJoiningGame : true
                 });
@@ -127,15 +133,27 @@ class App extends Component {
 	    }
     }
 
+    requestJoinGame = () => {
+	    console.log("requestJoinGame() called");
+
+	    let req = {
+	        playerId: '123'
+	        ,event: 'joingame'
+	    }
+
+	    socket.send(JSON.stringify(req));
+
+    }
+
 	requestEndGame = () => {
 	    console.log("requestEndGame() called");
 
-	    let endGameEvent = {
+	    let req = {
 	        playerId: '123'
 	        ,event: 'endgame'
 	    }
 
-	    socket.send(JSON.stringify(endGameEvent));
+	    socket.send(JSON.stringify(req));
 	}
 
 	endGame = () => {
