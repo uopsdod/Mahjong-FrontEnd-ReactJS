@@ -17,6 +17,7 @@ const divStyle = {
 };
 
 let player_g;
+let room_g;
 
 // const allTiles = [
 // 	'circle1','circle2','circle3','circle4','circle5','circle6','circle7','circle8','circle9'
@@ -84,17 +85,19 @@ class App extends Component {
 		// Add an event listener for when a connection is open
 		socket.onopen = function() {
 		    console.log('onopen() WebSocket connection opened. Ready to send messages.');
-		    this.requestJoinGame();
+		    let playerID = this.uuidv4();
+		    this.requestJoinGame(playerID);
 		}.bind(this);
 
 		// Add an event listener for when a message is received from the server
 		socket.onmessage = function(msg) {
-		  	console.log('onmessage() Message received from server: ' , msg);
-			console.log('onmessage() Message received from server data: ' , msg.data);
+//		  	console.log('onmessage() Message received from server: ' , msg);
             var data = JSON.parse(msg.data);
+            console.log('onmessage() ' + data.event + " matched");
+			console.log('onmessage() msg.data: ' , msg.data);
+
 
             if (data.event.toUpperCase() == 'joingame_done'.toUpperCase()){
-                console.log('onmessage() ' + data.event + " matched");
                 console.log('onmessage() data.player: ' , data.player);
                 player_g = data.player;
 
@@ -103,14 +106,8 @@ class App extends Component {
                 });
             }
 
-            if (data.event.toUpperCase() == 'endgame_done'.toUpperCase()){
-                console.log('onmessage() ' + data.event + " matched");
-                this.endGame();
-            }
-
 			if (data.event.toUpperCase() == 'initiateGame'.toUpperCase()){
-				console.log('onmessage() ' + data.event + " matched");
-				// TODO: get roomId from server
+			    room_g = data.room;
 				// TODO: get randomly shuffled decks from server
 				// TODO: get randomly assigned deck for each player from server
 				// TODO: basically, get every information that is now in the GameEnv class from the server
@@ -120,6 +117,12 @@ class App extends Component {
                     isInitiateGame : true
                 });
 			}
+
+
+            if (data.event.toUpperCase() == 'endgame_done'.toUpperCase()){
+                this.endGame();
+            }
+
 
 		}.bind(this); // ref: https://stackoverflow.com/questions/44072078/calling-function-in-onopen-event-of-websocket-in-react-js-component
 	}
@@ -133,11 +136,11 @@ class App extends Component {
 	    }
     }
 
-    requestJoinGame = () => {
+    requestJoinGame = (playerID) => {
 	    console.log("requestJoinGame() called");
 
 	    let req = {
-	        playerId: '123'
+	        playerId: playerID
 	        ,event: 'joingame'
 	    }
 
@@ -145,12 +148,20 @@ class App extends Component {
 
     }
 
+    stopJoinGame = () => {
+        console.log("stopJoinGame() called");
+        this.close();
+
+        this.setState({
+            isJoiningGame : false
+        });
+    }
+
 	requestEndGame = () => {
 	    console.log("requestEndGame() called");
 
 	    let req = {
-	        playerId: '123'
-	        ,event: 'endgame'
+	        event: 'endgame'
 	    }
 
 	    socket.send(JSON.stringify(req));
@@ -167,13 +178,11 @@ class App extends Component {
 
 	}
 
-    stopJoinGame = () => {
-        console.log("stopJoinGame() called");
-        this.close();
-
-        this.setState({
-            isJoiningGame : false
-        });
+	uuidv4 = () => {
+      return 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, function(c) {
+        var r = Math.random() * 16 | 0, v = c == 'x' ? r : (r & 0x3 | 0x8);
+        return v.toString(16);
+      });
     }
 
 	render() {
@@ -626,7 +635,7 @@ class GameEnv extends Component {
 	removeItemFromArrayByIndex = (ary, index) => {
 		ary.splice(index,1);
 	}
-	
+
 	/////////// Util section ends /////////////
 
 	render() {
