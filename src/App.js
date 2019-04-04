@@ -82,9 +82,6 @@ class App extends Component {
 		// Add an event listener for when a connection is open
 		socket.onopen = function() {
 		  console.log('onopen() WebSocket connection opened. Ready to send messages.');
-
-		  // Send a message to the server
-		  socket.send('Hello, from WebSocket client!');
 		};
 
 		// Add an event listener for when a message is received from the server
@@ -147,6 +144,7 @@ class App extends Component {
 
         this.setState({
             isInitiateGame : false
+            ,isJoiningGame : false
         });
 
 	}
