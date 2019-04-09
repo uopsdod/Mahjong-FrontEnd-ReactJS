@@ -4,21 +4,21 @@
 
 ### `Phase 1 - Front-End`
 
-DONE: Get your React front-end projct up and running with very fundamental rules implemented.
+- [x] Get your React front-end projct up and running with very fundamental rules implemented.
 
 #### DONE: Build AWS Codepipeline
 
 ### `Phase 2 - Front-End`
 
-DONE: Start your work for back-end project (Probably Java)
+- [x] Start your work for back-end project (Probably Java)
 
 ### `Phase 3 - Front-End`
 
-Put more detailed rules to the game in the React project
+- [ ] Put more detailed rules to the game in the React project
 
 ### `Phase 4 - Back-End`
 
-Decorate your page with pictures and css 
+- [ ] Decorate your page with pictures and css 
   
 
 Along the way, think about the whole structure and how to delpoy them easily and conveniently.
