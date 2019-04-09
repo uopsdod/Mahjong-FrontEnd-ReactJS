@@ -11,7 +11,6 @@ DONE: Get your React front-end projct up and running with very fundamental rules
 ### `Phase 2 - Front-End`
 
 DONE: Start your work for back-end project (Probably Java)
-<span style="color:blue">some *This is Blue italic.* text</span>
 
 ### `Phase 3 - Front-End`
 
