@@ -43,4 +43,4 @@ check if localhost:3000/ show the index.html page
 ## How to trigger the CodePipeline 
 git push 
 ### The basic route 
-Github - AWS CodePipeline Source - AWS CodePipeline Build (buildspec.yml)
+Github - AWS CodePipeline Source - AWS CodePipeline Build (buildspec.yml) - AWS S3 static hosting bucket
