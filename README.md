@@ -6,7 +6,7 @@
 
 - [x] Get your React front-end projct up and running with very fundamental rules implemented.
 
-- [x] Build AWS Codepipeline
+- [x] Build AWS Codepipeline to automate the deployment process
 
 ### `Phase 2 - Front-End`
 
