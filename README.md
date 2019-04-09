@@ -10,7 +10,8 @@ DONE: Get your React front-end projct up and running with very fundamental rules
 
 ### `Phase 2 - Front-End`
 
-Decorate your page with pictures and css 
+DONE: Start your work for back-end project (Probably Java)
+<span style="color:blue">some *This is Blue italic.* text</span>
 
 ### `Phase 3 - Front-End`
 
@@ -18,11 +19,10 @@ Put more detailed rules to the game in the React project
 
 ### `Phase 4 - Back-End`
 
-Start your work for back-end project (Probably Java)
-
+Decorate your page with pictures and css 
   
-Along the way, think about the whole structure and how to delpoy them easily and conveniently.
 
+Along the way, think about the whole structure and how to delpoy them easily and conveniently.
 
 
 ## How to run this project 
